@@ -1,0 +1,95 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Aplicación web en la nube</title>
+  <link rel="stylesheet" type="text/css" href="styles.css">
+</head>
+<body>
+  <h1>Bienvenido a la aplicación web en la nube</h1>
+  <div id="user-div">
+    <h3>Usuario: </h3>
+    <p id="user-email"></p>
+    <button id="signout-button" onclick="signOut()">Cerrar sesión</button>
+  </div>
+  
+  <div id="data-div">
+    <h2>Entidad r</h2>
+    <form id="data-form">
+      <label for="attribute1">Atributo 1: Ropa lunes</label>
+      <input type="text" id="attribute1" required><br>
+
+      <label for="attribute2">Atributo 2: Ropa martes</label>
+      <input type="text" id="attribute2" required><br>
+
+      <label for="attribute3">Atributo 3: Ropa miércoles</label>
+      <input type="text" id="attribute3" required><br>
+
+      <label for="attribute4">Atributo 4: Ropa jueves</label>
+      <input type="text" id="attribute4" required><br>
+
+      <label for="attribute5">Atributo 5 (fecha): Ropa por fecha</label>
+      <input type="date" id="attribute5" required><br>
+
+      <button type="submit">Agregar</button>
+    </form>
+    <ul id="data-list"></ul>
+  </div>
+  
+  <button id="signin-button" onclick="googleSignIn()">Iniciar sesión con Google</button>
+
+  <script src="https://www.gstatic.com/firebasejs/8.6.7/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.6.7/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.6.7/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.6.7/firebase-storage.js"></script>
+  <script src="app.js"></script>
+  <script>
+    var user;
+
+    firebase.auth().onAuthStateChanged(function(currentUser) {
+      if (currentUser) {
+        // Usuario ha iniciado sesión
+        user = currentUser;
+        document.getElementById("user-email").textContent = user.email;
+        document.getElementById("signin-button").style.display = "none";
+        document.getElementById("signout-button").style.display = "block";
+      } else {
+        // Usuario no ha iniciado sesión
+        user = null;
+        document.getElementById("user-email").textContent = "";
+        document.getElementById("signin-button").style.display = "block";
+        document.getElementById("signout-button").style.display = "none";
+      }
+    });
+
+    function googleSignIn() {
+      var provider = new firebase.auth.GoogleAuthProvider();
+      firebase.auth().signInWithPopup(provider)
+        .then((result) => {
+          // Inicio de sesión exitoso
+          user = result.user;
+          document.getElementById("user-email").textContent = user.email;
+          document.getElementById("signin-button").style.display = "none";
+          document.getElementById("signout-button").style.display = "block";
+        })
+        .catch((error) => {
+          // Error en el inicio de sesión
+          console.log(error);
+        });
+    }
+
+    function signOut() {
+      firebase.auth().signOut().then(() => {
+        // Cierre de sesión exitoso
+        user = null;
+        document.getElementById("user-email").textContent = "";
+        document.getElementById("signin-button").style.display = "block";
+        document.getElementById("signout-button").style.display = "none";
+      }).catch((error) => {
+        // Error en el cierre de sesión
+        console.log(error);
+      });
+    }
+  </script>
+</body>
+</html>
